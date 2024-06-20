@@ -34,4 +34,6 @@
     <string name="analyze">Analyze</string>
     <string name="enterImage">Capture Your Meal for Nutritional Info!</string>
     <string name="result">Here\'s your food Nutrition Facts</string>
+    <string name="empty_image_warning">Image cannot be empty</string>
+    <string name="passwordNotMatch">Password did not Match</string>
 </resources>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "51097939755",
+    "project_id": "fitfoody-authentication",
+    "storage_bucket": "fitfoody-authentication.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:51097939755:android:b49b7b5919be363a12df6e",
+        "android_client_info": {
+          "package_name": "com.example.fitfoody"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7g-QBaOka0VGIOlsulKDF2wUv9MHxsuw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

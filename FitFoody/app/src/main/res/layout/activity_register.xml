@@ -54,7 +54,7 @@
         tools:alpha="1" />
 
     <com.example.fitfoody.costumviews.CvPassword
-        android:id="@+id/PasswordLogin"
+        android:id="@+id/CVPassword"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -76,10 +76,10 @@
         android:alpha="1"
         android:backgroundTint="@color/green"
         android:text="@string/register_button"
-        app:layout_constraintEnd_toEndOf="@+id/PasswordLogin"
+        app:layout_constraintEnd_toEndOf="@+id/CVPassword"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/PasswordLogin"
-        app:layout_constraintTop_toBottomOf="@+id/PasswordLogin"
+        app:layout_constraintStart_toStartOf="@+id/CVPassword"
+        app:layout_constraintTop_toBottomOf="@+id/CVPassword"
         tools:alpha="1" />
 
 
