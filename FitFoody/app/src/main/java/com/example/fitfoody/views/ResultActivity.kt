@@ -7,27 +7,32 @@ import android.util.Log
 import android.widget.Toast
 import com.example.fitfoody.databinding.ActivityResultBinding
 import com.example.fitfoody.helper.ImageClassifierHelper
+import org.tensorflow.lite.support.label.Category
 import java.text.NumberFormat
+import java.util.Locale
 
 class ResultActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityResultBinding
     private lateinit var imageClassifierHelper: ImageClassifierHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityResultBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val imageUri = Uri.parse(intent.getStringExtra(EXTRA_IMAGE_URI))
-        imageUri?.let {
-            Log.d("Image URI", "showImage: $it")
-            binding.resultImage.setImageURI(it)
+        val imageUri = intent.getStringExtra(EXTRA_IMAGE_URI)?.let { Uri.parse(it) }
+        if (imageUri != null) {
+            Log.d("Image URI", "showImage: $imageUri")
+            binding.resultImage.setImageURI(imageUri)
+            startAnalyze(imageUri)
+        } else {
+            Toast.makeText(this, "Image URI is null", Toast.LENGTH_SHORT).show()
+            finish() // Close activity if no image URI is passed
         }
-        startAnalyze(imageUri)
-        imageClassifierHelper.classifyStaticImage(imageUri)
-
     }
-    private fun startAnalyze(imageUri: Uri?) {
+
+    private fun startAnalyze(imageUri: Uri) {
         imageClassifierHelper = ImageClassifierHelper(
             context = this,
             classifierListener = object : ImageClassifierHelper.ClassifierListener {
@@ -36,29 +41,24 @@ class ResultActivity : AppCompatActivity() {
                         Toast.makeText(this@ResultActivity, error, Toast.LENGTH_SHORT).show()
                     }
                 }
-                override fun onResults(results: List<Classifications>?) {
+
+                override fun onResults(results: List<Category>) {
                     runOnUiThread {
-                        results?.let { it ->
-                            if (it.isNotEmpty() && it[0].categories.isNotEmpty()) {
-                                println(it)
-                                val sortedCategories =
-                                    it[0].categories.sortedByDescending { it?.score }
-                                val displayResult =
-                                    sortedCategories.joinToString("\n") {
-                                        "${it.label} " + NumberFormat.getPercentInstance()
-                                            .format(it.score).trim()
-                                    }
-                                binding.resultText.text = displayResult
-                            } else {
-                                binding.resultText.text = ""
+                        if (results.isNotEmpty()) {
+                            val sortedCategories = results.sortedByDescending { category -> category.score }
+                            val displayResult = sortedCategories.joinToString("\n") { category ->
+                                "${category.label} " + NumberFormat.getPercentInstance().format(category.score).trim()
                             }
+                            binding.resultText.text = displayResult
+                        } else {
+                            binding.resultText.text = ""
                         }
                     }
                 }
             }
         )
+        imageClassifierHelper.classifyStaticImage(imageUri)
     }
-
 
     companion object {
         const val EXTRA_IMAGE_URI = "extra_image_uri"

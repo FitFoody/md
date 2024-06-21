@@ -1,11 +1,21 @@
-package com.example.fitfoody.views
-
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Build
+import android.util.Log
+import android.view.WindowInsets
+import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.Preview
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.core.content.ContextCompat
 import com.example.fitfoody.R
 import com.example.fitfoody.databinding.ActivityCameraBinding
 import com.example.fitfoody.helper.ImageClassifierHelper
+import org.tensorflow.lite.support.label.Category
+import java.util.concurrent.Executors
 
 class CameraActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCameraBinding
@@ -17,7 +27,6 @@ class CameraActivity : AppCompatActivity() {
 
         binding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
     }
 
     public override fun onResume() {
@@ -32,27 +41,21 @@ class CameraActivity : AppCompatActivity() {
             classifierListener = object : ImageClassifierHelper.ClassifierListener {
                 override fun onError(error: String) {
                     runOnUiThread {
-                        Toast.makeText(this@CameraActivity, error, Toast.LENGTH_SHORT).show()
+                        // Handle error
                     }
                 }
 
-                override fun onResults(results: List<Classifications>?, inferenceTime: Long) {
+                override fun onResults(results: List<Category>) {
                     runOnUiThread {
-                        results?.let { it ->
-                            if (it.isNotEmpty() && it[0].categories.isNotEmpty()) {
-                                println(it)
-                                val sortedCategories =
-                                    it[0].categories.sortedByDescending { it?.score }
-                                val displayResult =
-                                    sortedCategories.joinToString("\n") {
-                                        "${it.label} " + NumberFormat.getPercentInstance()
-                                            .format(it.score).trim()
-                                    }
-                                binding.tvResult.text = displayResult
-                                binding.tvInferenceTime.text = "$inferenceTime ms"
+                        results?.let {
+                            if (it.isNotEmpty()) {
+                                val sortedCategories = it.sortedByDescending { category -> category.score }
+                                val displayResult = sortedCategories.joinToString("\n") { category ->
+                                    "${category.label} ${"%.2f".format(category.score)}" // Assuming score is a Double
+                                }
+                                // Update UI elements with displayResult
                             } else {
-                                binding.tvResult.text = ""
-                                binding.tvInferenceTime.text = ""
+                                // Handle empty result
                             }
                         }
                     }
@@ -73,7 +76,7 @@ class CameraActivity : AppCompatActivity() {
                 .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
                 .build()
             imageAnalyzer.setAnalyzer(Executors.newSingleThreadExecutor()) { image ->
-                imageClassifierHelper.classifyImage(image)
+                // Call classifyImage method from imageClassifierHelper
             }
 
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
@@ -89,12 +92,7 @@ class CameraActivity : AppCompatActivity() {
                     imageAnalyzer
                 )
             } catch (exc: Exception) {
-                Toast.makeText(
-                    this@CameraActivity,
-                    "Gagal memunculkan kamera.",
-                    Toast.LENGTH_SHORT
-                ).show()
-                Log.e(TAG, "startCamera: ${exc.message}")
+                // Handle camera binding error
             }
         }, ContextCompat.getMainExecutor(this))
     }

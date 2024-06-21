@@ -92,7 +92,7 @@
         android:alpha="1"
         android:text="@string/tvLogin"
         android:textColor="@color/green"
-        android:textSize="18"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@+id/tvRegister"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.748"

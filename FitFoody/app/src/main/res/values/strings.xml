@@ -36,4 +36,5 @@
     <string name="result">Here\'s your food Nutrition Facts</string>
     <string name="empty_image_warning">Image cannot be empty</string>
     <string name="passwordNotMatch">Password did not Match</string>
+    <string name="image_classifier_failed">Image cannot be classified</string>
 </resources>

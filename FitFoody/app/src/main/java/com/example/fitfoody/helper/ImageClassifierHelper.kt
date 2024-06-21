@@ -5,24 +5,28 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import com.example.fitfoody.R
+import org.tensorflow.lite.support.image.TensorImage
+import org.tensorflow.lite.support.label.Category
+import org.tensorflow.lite.task.core.BaseOptions
+import org.tensorflow.lite.task.vision.detector.ObjectDetector
 
 class ImageClassifierHelper(
     var maxResults: Int = 1,
-    val modelName: String = "cancer_classification.tflite",
+    val modelName: String = "model.tflite",
     val context: Context,
     val classifierListener: ClassifierListener?,
     var threshold: Float = 0.1f
-
 ) {
 
-    private var imageClassifier: ImageClassifier? = null
+    private var imageClassifier: ObjectDetector? = null
 
     init {
         setupImageClassifier()
     }
 
     private fun setupImageClassifier() {
-        val optionsBuilder = ImageClassifier.ImageClassifierOptions.builder()
+        val optionsBuilder = ObjectDetector.ObjectDetectorOptions.builder()
             .setScoreThreshold(threshold)
             .setMaxResults(maxResults)
         val baseOptionsBuilder = BaseOptions.builder()
@@ -30,7 +34,7 @@ class ImageClassifierHelper(
         optionsBuilder.setBaseOptions(baseOptionsBuilder.build())
 
         try {
-            imageClassifier = ImageClassifier.createFromFileAndOptions(
+            imageClassifier = ObjectDetector.createFromFileAndOptions(
                 context,
                 modelName,
                 optionsBuilder.build()
@@ -39,29 +43,25 @@ class ImageClassifierHelper(
             classifierListener?.onError(context.getString(R.string.image_classifier_failed))
             Log.e(TAG, e.message.toString())
         }
-        // TODO: Menyiapkan Image Classifier untuk memproses gambar.
     }
 
     fun classifyStaticImage(imageUri: Uri) {
         try {
             val bitmap = uriToBitmap(imageUri)
             val tensorImage = TensorImage.fromBitmap(bitmap)
-            val results = imageClassifier?.classify(tensorImage)
+            val results = imageClassifier?.detect(tensorImage)
 
-            if (results != null) {
-                classifierListener?.onResults(
-                    results,
-                )
+            if (results != null && results.isNotEmpty()) {
+                val categories = results.flatMap { it.categories }
+                classifierListener?.onResults(categories)
             } else {
                 classifierListener?.onError("No classification result")
             }
         } catch (e: Exception) {
-            Log.e("ImageClassifier", "Classification error: ${e.localizedMessage}", e)
+            Log.e(TAG, "Classification error: ${e.localizedMessage}", e)
             classifierListener?.onError("Error during classification: ${e.localizedMessage}")
         }
-        // TODO: mengklasifikasikan imageUri dari gambar statis.
     }
-
 
     private fun uriToBitmap(uri: Uri): Bitmap? {
         return try {
@@ -74,15 +74,12 @@ class ImageClassifierHelper(
         }
     }
 
-
-
     interface ClassifierListener {
         fun onError(error: String)
-        fun onResults(
-            results: List<Classifications>?,
-        )
+        fun onResults(results: List<Category>)
     }
+
     companion object {
         private const val TAG = "ImageClassifierHelper"
     }
-
+}

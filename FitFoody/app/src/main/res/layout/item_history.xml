@@ -18,7 +18,6 @@
         android:layout_height="wrap_content"
         android:padding="8dp">
 
-
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/iv_list_photo"
             android:layout_width="136dp"
@@ -33,7 +32,6 @@
             android:id="@+id/tv_food_name"
             android:layout_width="0dp"
             android:layout_height="28dp"
-            android:layout_toEndOf="@id/iv_list_photo"
             android:textSize="24sp"
             android:textStyle="bold"
             card_view:layout_constraintBottom_toBottomOf="@+id/iv_list_photo"
@@ -45,11 +43,10 @@
             tools:text="@string/tv_food_name" />
 
         <TextView
-            android:id="@+id/tv_nutrition_facs"
+            android:id="@+id/tvNutritionFacts"
             android:layout_width="0dp"
             android:layout_height="28dp"
             android:layout_marginTop="8dp"
-            android:layout_toEndOf="@id/iv_list_photo"
             android:textSize="13sp"
             card_view:layout_constraintBottom_toBottomOf="@+id/iv_list_photo"
             card_view:layout_constraintEnd_toEndOf="parent"
@@ -58,7 +55,6 @@
             card_view:layout_constraintTop_toBottomOf="@+id/tv_food_name"
             card_view:layout_constraintVertical_bias="0.0"
             tools:text="@string/tv_food_nutrition" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
